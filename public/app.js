@@ -32,3 +32,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
   console.log('Globo cargado correctamente');
 });
+
+fetch('http://127.0.0.1:8000/api/destinos')
+  .then(response => response.json())
+  .then(data => {
+    console.log('DATOS DESDE SYMFONY:', data);
+  })
+  .catch(error => {
+    console.error('ERROR FETCH DESTINOS:', error);
+});
