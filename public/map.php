@@ -64,25 +64,10 @@ session_start();
                 <p>Tus destinos guardados aparecerán aquí</p>
             </div>
 
-            <div class="visited__list">
+            <div class="visited__list" id="visitedList">
                 <article class="visited__item">
-                <h3>España</h3>
-                <p>3 reseñas</p>
-                </article>
-
-                <article class="visited__item">
-                <h3>Francia</h3>
-                <p>1 reseña</p>
-                </article>
-
-                <article class="visited__item">
-                <h3>Japón</h3>
-                <p>5 reseñas</p>
-                </article>
-
-                <article class="visited__item">
-                <h3>Estados Unidos</h3>
-                <p>2 reseñas</p>
+                    <h3>No hay países visitados todavía</h3>
+                    <p>Se cargarán automáticamente</p>
                 </article>
             </div>
             </section>
@@ -94,7 +79,10 @@ session_start();
                 <span class="country-panel__eyebrow">Country Name</span>
                 <h2 id="countryName">Selecciona un país</h2>
                 <p id="countrySubtitle">Aquí aparecerá la información del país seleccionado.</p>
-            </div>
+                <div id="countryInfo" class="country-panel__info">
+                  <p>Selecciona un destino para ver su información.</p>
+                </div>
+              </div>
 
             <section class="country-panel__section">
                 <h3>Reviews</h3>
@@ -119,6 +107,7 @@ session_start();
   </div>
 
   <script src="https://unpkg.com/globe.gl"></script>
+  <script src="https://unpkg.com/topojson-client@3"></script>
   <script src="map.js"></script>
 </body>
 </html>

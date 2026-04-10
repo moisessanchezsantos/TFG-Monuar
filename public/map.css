@@ -234,6 +234,12 @@ body {
   color: var(--muted);
 }
 
+.visited__item--active {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(124, 108, 255, 0.12);
+  transform: translateY(-2px);
+}
+
 .dashboard__panel {
   width: 100%;
 }
@@ -348,5 +354,32 @@ body {
 
   .globe-card {
     height: 420px;
+  }
+
+  .country-panel__info {
+    margin-top: 16px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .country-panel__info div,
+  .country-panel__info p {
+    margin: 0;
+    line-height: 1.5;
+    white-space: normal;
+  }
+  .visited__item {
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .visited__item:hover {
+    transform: translateY(-2px);
   }
 }
