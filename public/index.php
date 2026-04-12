@@ -95,5 +95,45 @@ unset($_SESSION['login_error']);
   <!-- Globe.gl (trae Three dentro, cero líos con módulos) -->
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="app.js"></script>
+  <div id="ai-chat-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+    <button onclick="document.getElementById('ai-window').style.display='flex'" style="width:60px; height:60px; border-radius:50%; background:#4f46e5; color:white; border:none; cursor:pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+        🤖
+    </button>
+    
+    <div id="ai-window" style="display:none; position:absolute; bottom:80px; right:0; width:300px; height:400px; background:white; border-radius:15px; flex-direction:column; box-shadow:0 5px 25px rgba(0,0,0,0.2); overflow:hidden; border:1px solid #ddd;">
+        <div style="background:#4f46e5; color:white; padding:10px; text-align:center; font-weight:bold;">Asistente de Viajes</div>
+        <div id="ai-messages" style="flex:1; padding:15px; overflow-y:auto; color:#333; font-size:14px;">
+            ¡Hola! Pregúntame por un destino.
+        </div>
+        <div style="padding:10px; border-top:1px solid #eee; display:flex;">
+            <input type="text" id="ai-input" placeholder="¿A dónde vamos?" style="flex:1; padding:5px; border:1px solid #ddd; border-radius:5px;">
+            <button onclick="preguntarIA()" style="margin-left:5px; background:#4f46e5; color:white; border:none; border-radius:5px; padding:5px 10px; cursor:pointer;">-></button>
+        </div>
+    </div>
+</div>
+
+<script>
+async function preguntarIA() {
+    const input = document.getElementById('ai-input');
+    const box = document.getElementById('ai-messages');
+    const msg = input.value;
+    if(!msg) return;
+
+    box.innerHTML += `<div style="margin-bottom:10px; text-align:right;"><b>Tú:</b> ${msg}</div>`;
+    input.value = '';
+
+    try {
+        const res = await fetch('api_bot.php', {
+            method: 'POST',
+            body: JSON.stringify({ mensaje: msg })
+        });
+        const data = await res.json();
+        if(data.status === 'success') {
+            box.innerHTML += `<div style="margin-bottom:10px;"><b>Bot:</b> Te sugiero ${data.pais} <br><img src="${data.datos.flags.svg}" style="width:100px;"></div>`;
+        }
+    } catch(e) { box.innerHTML += "<div>Error de conexión.</div>"; }
+    box.scrollTop = box.scrollHeight;
+}
+</script>
 </body>
 </html>
