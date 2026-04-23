@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test View Mode</title>
+</head>
+<body>
+  <h1>Test de Variables JavaScript</h1>
+  
+  <div id="output"></div>
+
+  <script>
+    // Simular las variables como las genera map.php
+    const VIEW_USER_ID = 0;
+    const IS_VIEW_MODE = false;
+    const CURRENT_USER_ID = 8;
+
+    // Código de map.js
+    const viewUserId = typeof VIEW_USER_ID !== 'undefined' ? VIEW_USER_ID : null;
+    const isViewMode = typeof IS_VIEW_MODE !== 'undefined' ? IS_VIEW_MODE : false;
+
+    // Mostrar resultados
+    const output = document.getElementById('output');
+    output.innerHTML = `
+      <h2>Variables Definidas:</h2>
+      <p>VIEW_USER_ID: ${VIEW_USER_ID} (${typeof VIEW_USER_ID})</p>
+      <p>IS_VIEW_MODE: ${IS_VIEW_MODE} (${typeof IS_VIEW_MODE})</p>
+      <p>CURRENT_USER_ID: ${CURRENT_USER_ID} (${typeof CURRENT_USER_ID})</p>
+      
+      <h2>Variables Locales:</h2>
+      <p>viewUserId: ${viewUserId} (${typeof viewUserId})</p>
+      <p>isViewMode: ${isViewMode} (${typeof isViewMode})</p>
+      
+      <h2>Condiciones:</h2>
+      <p>!isViewMode: ${!isViewMode}</p>
+      <p>¿Se debería ejecutar el código del buscador?: ${!isViewMode ? '✅ SÍ' : '❌ NO'}</p>
+    `;
+  </script>
+</body>
+</html>
