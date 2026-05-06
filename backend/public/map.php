@@ -153,7 +153,7 @@ if ($isViewMode) {
             </div>
             <?php endif; ?>
             <div class="country-panel__header">
-                <span class="country-panel__eyebrow">Country Name</span>
+                <span class="country-panel__eyebrow">Nombre del país</span>
                 <h2 id="countryName">Selecciona un país</h2>
                 <p id="countrySubtitle">Aquí aparecerá la información del país seleccionado.</p>
                 <div id="countryInfo" class="country-panel__info">
@@ -161,23 +161,28 @@ if ($isViewMode) {
                 </div>
               </div>
 
-            <section class="country-panel__section">
-                <h3>Reviews</h3>
-                <div class="country-panel__box">
-                <p>Las reseñas del país aparecerán aquí.</p>
+            <section class="country-panel__section" id="photosSection">
+                <h3>Fotos</h3>
+                <div id="photosContainer" class="country-panel__photos-grid">
+                <p>Selecciona un país visitado para ver o añadir fotos.</p>
                 </div>
             </section>
 
-            <section class="country-panel__section">
-                <h3>Photos</h3>
-                <div class="country-panel__photo">
-                <span>Imagen del país</span>
+            <section class="country-panel__section" id="reviewsSection">
+                <h3>Reseñas</h3>
+                <div id="reviewsContainer" class="country-panel__reviews-list">
+                <p>Selecciona un país visitado para ver o añadir reseñas.</p>
                 </div>
             </section>
 
-            <button class="country-panel__button" type="button">
-                Añadir reseña
-            </button>
+            <div id="actionButtons" style="display: none;">
+                <button id="addPhotoBtn" class="country-panel__button" type="button" style="margin-bottom: 10px;">
+                    Añadir foto
+                </button>
+                <button id="addReviewBtn" class="country-panel__button" type="button">
+                    Añadir reseña
+                </button>
+            </div>
             </div>
         </aside>
     </main>
@@ -246,6 +251,68 @@ if ($isViewMode) {
           <p>Cargando reseñas...</p>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal para añadir foto -->
+  <div id="addPhotoModal" class="add-modal" style="display: none;">
+    <div class="add-modal__overlay" onclick="closeAddPhotoModal()"></div>
+    <div class="add-modal__content">
+      <button class="add-modal__close" onclick="closeAddPhotoModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <h2 class="add-modal__title">Añadir Foto</h2>
+      <form id="addPhotoForm" class="add-modal__form" enctype="multipart/form-data">
+        <div>
+          <label class="add-modal__label">Seleccionar imagen</label>
+          <input type="file" id="photoFile" class="add-modal__input" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" required>
+          <small style="color: var(--muted); font-size: 12px; margin-top: 4px; display: block;">Formatos: JPG, PNG, GIF, WEBP (máx. 5MB)</small>
+        </div>
+        <div>
+          <label class="add-modal__label">Descripción (opcional)</label>
+          <textarea id="photoDescription" class="add-modal__textarea" placeholder="Descripción de la foto"></textarea>
+        </div>
+        <button type="submit" class="add-modal__submit">Guardar Foto</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para añadir reseña -->
+  <div id="addReviewModal" class="add-modal" style="display: none;">
+    <div class="add-modal__overlay" onclick="closeAddReviewModal()"></div>
+    <div class="add-modal__content">
+      <button class="add-modal__close" onclick="closeAddReviewModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <h2 class="add-modal__title">Añadir Reseña</h2>
+      <form id="addReviewForm" class="add-modal__form">
+        <div>
+          <label class="add-modal__label">Título</label>
+          <input type="text" id="reviewTitle" class="add-modal__input" placeholder="Título de tu reseña" required maxlength="150">
+        </div>
+        <div>
+          <label class="add-modal__label">Puntuación</label>
+          <div class="add-modal__rating" id="ratingStars">
+            <span class="add-modal__star" data-rating="1">★</span>
+            <span class="add-modal__star" data-rating="2">★</span>
+            <span class="add-modal__star" data-rating="3">★</span>
+            <span class="add-modal__star" data-rating="4">★</span>
+            <span class="add-modal__star" data-rating="5">★</span>
+          </div>
+          <input type="hidden" id="reviewRating" value="0" required>
+        </div>
+        <div>
+          <label class="add-modal__label">Contenido</label>
+          <textarea id="reviewContent" class="add-modal__textarea" placeholder="Cuéntanos sobre tu experiencia en este país" required></textarea>
+        </div>
+        <button type="submit" class="add-modal__submit">Guardar Reseña</button>
+      </form>
     </div>
   </div>
 
