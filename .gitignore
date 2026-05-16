@@ -1,0 +1,52 @@
+# ========================
+# PHP / Composer
+# ========================
+/Proyecto/backend/vendor/
+/Proyecto/backend/composer.lock
+
+# ========================
+# Symfony cache & logs
+# ========================
+/Proyecto/backend/var/cache/
+/Proyecto/backend/var/log/
+/Proyecto/backend/var/sessions/
+
+# ========================
+# Variables de entorno
+# ========================
+.env
+.env.local
+.env.*.local
+
+# ========================
+# Archivos de sistema
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================
+# IDEs
+# ========================
+.idea/
+.vscode/settings.json
+*.swp
+*.swo
+
+# ========================
+# PHP Unit
+# ========================
+.phpunit.result.cache
+/Proyecto/backend/var/test/
+
+# ========================
+# Node (por si acaso)
+# ========================
+node_modules/
+npm-debug.log*
+
+# ========================
+# Scripts temporales de debug
+# ========================
+/Proyecto/backend/scripts/check_*.php
+/Proyecto/backend/scripts/seed_*.php
