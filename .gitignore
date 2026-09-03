@@ -23,6 +23,19 @@
 # ========================
 .DS_Store
 Thumbs.db
+
+# Configuración local y secretos
+**/.env
+**/.env.*
+!**/.env.example
+
+# Dependencias y archivos generados
+**/vendor/
+**/var/
+**/public/assets/
+**/public/uploads/*
+!**/public/uploads/.htaccess
+Thumbs.db
 desktop.ini
 
 # ========================
