@@ -36,7 +36,7 @@ try {
     
     // Obtener las reseñas del usuario para este país
     $stmt = $pdo->prepare("
-        SELECT id, titulo, contenido, puntuacion, fecha_resena
+        SELECT id, usuario_id, titulo, contenido, puntuacion, fecha_resena
         FROM resena
         WHERE usuario_id = :usuario_id AND pais_id = :pais_id
         ORDER BY fecha_resena DESC

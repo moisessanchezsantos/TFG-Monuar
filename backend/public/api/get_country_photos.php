@@ -34,25 +34,40 @@ try {
     
     $pais_id = $pais['id'];
     
-    // Obtener las fotos (publicaciones) del usuario para este país
+    // ID del usuario que está viendo (para verificar si dio like)
+    $current_user_id = $_SESSION['user']['id'];
+    
+    // Obtener las fotos (publicaciones) del usuario para este país con info de likes
     $stmt = $pdo->prepare("
-        SELECT id, descripcion, imagen_url, fecha_publicacion
-        FROM publicacion
-        WHERE usuario_id = :usuario_id AND pais_id = :pais_id
-        ORDER BY fecha_publicacion DESC
+        SELECT 
+            p.id, 
+            p.usuario_id,
+            p.descripcion, 
+            p.imagen_url, 
+            p.fecha_publicacion,
+            COUNT(l.id) as total_likes,
+            MAX(CASE WHEN l.usuario_id = :current_user_id THEN 1 ELSE 0 END) as user_liked
+        FROM publicacion p
+        LEFT JOIN likes l ON p.id = l.publicacion_id
+        WHERE p.usuario_id = :usuario_id AND p.pais_id = :pais_id
+        GROUP BY p.id
+        ORDER BY p.fecha_publicacion DESC
     ");
     
     $stmt->execute([
         'usuario_id' => $user_id,
-        'pais_id' => $pais_id
+        'pais_id' => $pais_id,
+        'current_user_id' => $current_user_id
     ]);
     
     $photos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Formatear las fechas
+    // Formatear las fechas y convertir valores
     foreach ($photos as &$photo) {
         $date = new DateTime($photo['fecha_publicacion']);
         $photo['fecha_formateada'] = $date->format('d/m/Y');
+        $photo['total_likes'] = intval($photo['total_likes']);
+        $photo['user_liked'] = intval($photo['user_liked']) === 1;
     }
     
     echo json_encode([

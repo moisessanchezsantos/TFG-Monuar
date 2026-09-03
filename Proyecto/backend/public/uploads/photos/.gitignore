@@ -1,5 +1,0 @@
-# Ignorar todas las imágenes subidas por usuarios
-*
-# Pero mantener este archivo y .gitkeep
-!.gitignore
-!.gitkeep

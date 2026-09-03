@@ -9,6 +9,14 @@ if (!isset($_SESSION['user'])) {
 
 $currentUser = $_SESSION['user'];
 
+// Obtener información de admin del usuario actual
+require_once __DIR__ . '/../config/monar_database.php';
+$pdo = getDBConnection();
+$stmt = $pdo->prepare("SELECT es_admin FROM usuario WHERE id = :id");
+$stmt->execute(['id' => $currentUser['id']]);
+$currentUserData = $stmt->fetch(PDO::FETCH_ASSOC);
+$isAdmin = $currentUserData && $currentUserData['es_admin'] == 1;
+
 // Verificar si estamos en modo de visualización de otro usuario
 $viewUserId = isset($_GET['view_user']) ? intval($_GET['view_user']) : 0;
 $isViewMode = $viewUserId > 0 && $viewUserId != $currentUser['id'];
@@ -42,6 +50,7 @@ if ($isViewMode) {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mapa de <?= htmlspecialchars($displayName) ?> · MONAR</title>
   <link rel="stylesheet" href="assets/css/map.css" />
+  <link rel="stylesheet" href="assets/css/chatbot.css" />
 
 </head>
 
@@ -63,42 +72,31 @@ if ($isViewMode) {
         </div>
       </div>
 
-      <?php if (!$isViewMode): ?>
-      <div class="search-wrapper search-wrapper--centered">
-        <input
-          type="text"
-          id="searchUser"
-          class="topbar__search topbar__search--user"
-          placeholder="Buscar usuario..."
-          autocomplete="off"
-        />
-        <div id="userSearchResults" class="search-results search-results--users" style="display: none;"></div>
-      </div>
-      <?php endif; ?>
-
       <div class="topbar__right">
         <div class="topbar__user">
           <?php if ($isViewMode): ?>
-          <span class="topbar__username" style="background: rgba(92, 184, 92, 0.15); border: 1px solid rgba(92, 184, 92, 0.3);">
+          <span class="topbar__username topbar__username--viewing">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"></path>
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+              <path d="M2 12h20"></path>
             </svg>
-            Modo Lectura
+            Mapa de <?= htmlspecialchars($displayName) ?>
           </span>
-          <a href="map.php" class="topbar__logout" style="background: rgba(92, 184, 92, 0.15); border: 1px solid rgba(92, 184, 92, 0.3);">
+          <a href="map.php" class="topbar__logout topbar__logout--back">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M19 12H5M12 19l-7-7 7-7"></path>
             </svg>
-            Volver a mi mapa
+            Volver
           </a>
           <?php else: ?>
-          <span class="topbar__username">
+          <a href="profile.php" class="topbar__username" title="Mi perfil">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
             <?= htmlspecialchars($user['nombre_usuario']) ?>
-          </span>
+          </a>
           <a href="logout.php" class="topbar__logout" title="Cerrar sesión">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -117,6 +115,17 @@ if ($isViewMode) {
             <div class="globe-card">
             <div id="mapGlobe" class="globe-card__canvas"></div>
 
+            <?php if ($isAdmin && !$isViewMode): ?>
+            <a href="dashboard.php" class="fab-dashboard" title="Panel de administración">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </a>
+            <?php endif; ?>
+
             <div class="globe-card__overlay">
                 <div class="globe-card__badge"><?= $isViewMode ? 'Mapa de ' . htmlspecialchars($displayName) : 'Mapa 3D interactivo' ?></div>
                 <div class="globe-card__hint">Arrastra para rotar · Scroll para zoom</div>
@@ -129,11 +138,23 @@ if ($isViewMode) {
                 <p><?= $isViewMode ? 'Destinos de ' . htmlspecialchars($displayName) : 'Tus destinos guardados aparecerán aquí' ?></p>
             </div>
 
-            <div class="visited__list" id="visitedList">
-                <article class="visited__item">
-                    <h3>No hay países visitados todavía</h3>
-                    <p>Se cargarán automáticamente</p>
-                </article>
+            <div class="visited__carousel-container">
+                <button class="visited__nav visited__nav--prev" id="carouselPrev" aria-label="Anterior">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M12 16L6 10L12 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="visited__list" id="visitedList">
+                    <article class="visited__item">
+                        <h3>No hay países visitados todavía</h3>
+                        <p>Se cargarán automáticamente</p>
+                    </article>
+                </div>
+                <button class="visited__nav visited__nav--next" id="carouselNext" aria-label="Siguiente">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M8 4L14 10L8 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
             </div>
             </section>
         </section>
@@ -141,15 +162,28 @@ if ($isViewMode) {
         <aside class="dashboard__panel">
             <div class="country-panel">
             <?php if (!$isViewMode): ?>
-            <div class="search-wrapper search-wrapper--panel">
-              <input
-                type="text"
-                id="searchCountry"
-                class="topbar__search country-panel__search"
-                placeholder="Buscar país..."
-                autocomplete="off"
-              />
-              <div id="searchResults" class="search-results" style="display: none;"></div>
+            <div class="panel-search-section">
+              <div class="search-wrapper search-wrapper--panel">
+                <input
+                  type="text"
+                  id="searchUser"
+                  class="topbar__search panel-search__input"
+                  placeholder="Buscar usuario..."
+                  autocomplete="off"
+                />
+                <div id="userSearchResults" class="search-results search-results--users" style="display: none;"></div>
+              </div>
+              
+              <div class="search-wrapper search-wrapper--panel">
+                <input
+                  type="text"
+                  id="searchCountry"
+                  class="topbar__search country-panel__search"
+                  placeholder="Buscar país..."
+                  autocomplete="off"
+                />
+                <div id="searchResults" class="search-results" style="display: none;"></div>
+              </div>
             </div>
             <?php endif; ?>
             <div class="country-panel__header">
@@ -226,6 +260,17 @@ if ($isViewMode) {
           <span class="user-modal__stat-value" id="modalTotalContinents">0</span>
           <span class="user-modal__stat-label">Continentes</span>
         </div>
+      </div>
+
+      <!-- Barra de seguimiento -->
+      <div class="user-modal__follow-bar">
+        <div class="user-modal__follow-copy">
+          <p id="modalFollowStatus" class="user-modal__follow-status">Cargando...</p>
+          <p id="modalFollowMeta" class="user-modal__follow-meta">0 seguidores &middot; 0 seguidos</p>
+        </div>
+        <button id="modalFollowBtn" type="button" class="user-modal__follow-btn" onclick="toggleFollowCurrentUser()" disabled>
+          Seguir
+        </button>
       </div>
 
       <div style="margin-bottom: 24px; text-align: center;">
@@ -316,6 +361,31 @@ if ($isViewMode) {
     </div>
   </div>
 
+  <!-- Modal para vista ampliada de foto -->
+  <div id="photoViewerModal" class="photo-viewer-modal" style="display: none;">
+    <div class="photo-viewer-modal__overlay" onclick="closePhotoViewer()"></div>
+    <div class="photo-viewer-modal__content">
+      <button class="photo-viewer-modal__close" onclick="closePhotoViewer()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <img id="photoViewerImage" src="" alt="Foto ampliada" class="photo-viewer-modal__image">
+      <div class="photo-viewer-modal__info">
+        <p id="photoViewerDescription" class="photo-viewer-modal__description"></p>
+        <div class="photo-viewer-modal__stats">
+          <span id="photoViewerLikes" class="photo-viewer-modal__likes">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span id="photoViewerLikesCount">0</span> me gusta
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="https://unpkg.com/topojson-client@3"></script>
   <script>
@@ -325,5 +395,6 @@ if ($isViewMode) {
     const CURRENT_USER_ID = <?= $currentUser['id'] ?>;
   </script>
   <script src="assets/js/map.js"></script>
+  <script src="assets/js/chatbot.js"></script>
 </body>
 </html>

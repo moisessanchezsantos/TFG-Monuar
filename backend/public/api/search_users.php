@@ -15,6 +15,7 @@ $currentUserId = $_SESSION['user']['id'];
 
 try {
   $pdo = getDBConnection();
+  ensureUserFollowTable($pdo);
   
   $query = isset($_GET['q']) ? trim($_GET['q']) : '';
   
@@ -25,18 +26,27 @@ try {
   
   // Buscar usuarios por nombre o correo (excluyendo al usuario actual)
   $stmt = $pdo->prepare("
-    SELECT id, nombre_usuario, correo_electronico as email, fecha_registro
-    FROM usuario 
-    WHERE (nombre_usuario LIKE :query OR correo_electronico LIKE :query2)
-    AND id != :current_user_id
-    ORDER BY nombre_usuario
+    SELECT
+      u.id,
+      u.nombre_usuario,
+      u.correo_electronico AS email,
+      u.fecha_registro,
+      EXISTS(
+        SELECT 1 FROM usuario_seguidor us
+        WHERE us.seguidor_id = :cuid_follow AND us.seguido_id = u.id
+      ) AS is_following
+    FROM usuario u
+    WHERE (u.nombre_usuario LIKE :query OR u.correo_electronico LIKE :query2)
+      AND u.id != :cuid_exclude
+    ORDER BY is_following DESC, u.nombre_usuario
     LIMIT 15
   ");
   
   $stmt->execute([
-    'query' => '%' . $query . '%',
-    'query2' => '%' . $query . '%',
-    'current_user_id' => $currentUserId
+    'query'        => '%' . $query . '%',
+    'query2'       => '%' . $query . '%',
+    'cuid_follow'  => $currentUserId,
+    'cuid_exclude' => $currentUserId,
   ]);
   
   $users = $stmt->fetchAll(PDO::FETCH_ASSOC);

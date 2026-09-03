@@ -11,6 +11,7 @@ unset($_SESSION['login_error'], $_SESSION['register_success']);
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Iniciar sesión · MONAR</title>
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/chatbot.css" />
 </head>
 
 <body>
@@ -47,14 +48,14 @@ unset($_SESSION['login_error'], $_SESSION['register_success']);
       </header>
 
       <?php if ($success): ?>
-        <div class="alert" role="alert" style="background: rgba(76, 175, 80, 0.1); border-color: rgba(76, 175, 80, 0.3); color: #4caf50;">
-          <strong>¡Éxito!</strong> <?= htmlspecialchars($success) ?>
+        <div class="alert alert--success" role="alert">
+          <strong>✓ ¡Éxito!</strong> <?= htmlspecialchars($success) ?>
         </div>
       <?php endif; ?>
 
       <?php if ($error): ?>
         <div class="alert" role="alert">
-          <strong>Ups:</strong> <?= htmlspecialchars($error) ?>
+          <strong>⚠️ Ups:</strong> <?= htmlspecialchars($error) ?>
         </div>
       <?php endif; ?>
 
@@ -102,5 +103,6 @@ unset($_SESSION['login_error'], $_SESSION['register_success']);
   <!-- Globe.gl (trae Three dentro, cero líos con módulos) -->
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="assets/js/app.js"></script>
+  <script src="assets/js/chatbot.js"></script>
 </body>
 </html>

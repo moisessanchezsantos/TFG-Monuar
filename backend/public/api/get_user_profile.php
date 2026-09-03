@@ -21,14 +21,28 @@ if ($userId <= 0) {
 
 try {
   $pdo = getDBConnection();
+  ensureUserFollowTable($pdo);
+  $currentUserId = (int) $_SESSION['user']['id'];
   
-  // Obtener información del usuario
+  // Obtener información del usuario incluyendo estado de seguimiento
   $stmt = $pdo->prepare("
-    SELECT id, nombre_usuario, correo_electronico as email, fecha_registro
-    FROM usuario 
-    WHERE id = :user_id
+    SELECT
+      u.id,
+      u.nombre_usuario,
+      u.correo_electronico AS email,
+      u.fecha_registro,
+      EXISTS(
+        SELECT 1 FROM usuario_seguidor us
+        WHERE us.seguidor_id = :cuid1 AND us.seguido_id = u.id
+      ) AS is_following,
+      EXISTS(
+        SELECT 1 FROM usuario_seguidor us
+        WHERE us.seguidor_id = u.id AND us.seguido_id = :cuid2
+      ) AS follows_you
+    FROM usuario u
+    WHERE u.id = :user_id
   ");
-  $stmt->execute(['user_id' => $userId]);
+  $stmt->execute(['user_id' => $userId, 'cuid1' => $currentUserId, 'cuid2' => $currentUserId]);
   $user = $stmt->fetch(PDO::FETCH_ASSOC);
   
   if (!$user) {
@@ -72,11 +86,29 @@ try {
   $stmt->execute(['user_id' => $userId]);
   $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
   
+  // Contar total real de reseñas (sin limite)
+  $stmt = $pdo->prepare("SELECT COUNT(*) AS total FROM resena WHERE usuario_id = :user_id");
+  $stmt->execute(['user_id' => $userId]);
+  $totalResenas = (int) ($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
+
+  // Contadores de seguidores/seguidos
+  $stmt = $pdo->prepare("
+    SELECT
+      SUM(CASE WHEN seguido_id  = :uid1 THEN 1 ELSE 0 END) AS followers_count,
+      SUM(CASE WHEN seguidor_id = :uid2 THEN 1 ELSE 0 END) AS following_count
+    FROM usuario_seguidor
+    WHERE seguido_id = :uid3 OR seguidor_id = :uid4
+  ");
+  $stmt->execute(['uid1' => $userId, 'uid2' => $userId, 'uid3' => $userId, 'uid4' => $userId]);
+  $followCounts = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
   // Obtener estadísticas
   $stats = [
-    'total_paises' => count($visitedCountries),
-    'total_resenas' => count($reviews),
-    'continentes' => []
+    'total_paises'    => count($visitedCountries),
+    'total_resenas'   => $totalResenas,
+    'continentes'     => [],
+    'followers_count' => (int) ($followCounts['followers_count'] ?? 0),
+    'following_count' => (int) ($followCounts['following_count'] ?? 0),
   ];
   
   // Contar países por continente

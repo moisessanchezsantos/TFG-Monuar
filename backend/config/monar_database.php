@@ -1,12 +1,13 @@
 <?php
 /**
  * Configuración de base de datos
+ * Lee las variables de entorno si existen (Docker), o usa los valores por defecto (XAMPP/local).
  */
 
-define('DB_HOST', '127.0.0.1');
-define('DB_NAME', 'monuar_db');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_HOST',    getenv('DB_HOST')    ?: '127.0.0.1');
+define('DB_NAME',    getenv('DB_NAME')    ?: 'monuar_db');
+define('DB_USER',    getenv('DB_USER')    ?: 'root');
+define('DB_PASS',    getenv('DB_PASS')    ?: '');
 define('DB_CHARSET', 'utf8mb4');
 
 /**
@@ -31,4 +32,29 @@ function getDBConnection() {
     }
     
     return $pdo;
+}
+
+/**
+ * Asegura que exista la tabla de seguimiento entre usuarios.
+ */
+function ensureUserFollowTable(PDO $pdo): void {
+    static $initialized = false;
+    if ($initialized) { return; }
+
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS usuario_seguidor (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            seguidor_id INT NOT NULL,
+            seguido_id  INT NOT NULL,
+            fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE KEY uniq_us (seguidor_id, seguido_id),
+            INDEX idx_seguidor (seguidor_id),
+            INDEX idx_seguido  (seguido_id),
+            CONSTRAINT fk_us_seguidor FOREIGN KEY (seguidor_id) REFERENCES usuario(id) ON DELETE CASCADE,
+            CONSTRAINT fk_us_seguido  FOREIGN KEY (seguido_id)  REFERENCES usuario(id) ON DELETE CASCADE,
+            CONSTRAINT chk_us_distinto CHECK (seguidor_id <> seguido_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+
+    $initialized = true;
 }
