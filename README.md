@@ -10,7 +10,7 @@ Necesitas tener instalado:
 
 - PHP 8.4 o superior
 - Composer
-- MySQL 8 o MariaDB
+- MySQL 8 
 - Un navegador web
 
 Puedes usar XAMPP para PHP y MySQL, o Docker Desktop para levantar los servicios en contenedores.
