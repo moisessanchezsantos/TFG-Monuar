@@ -1,116 +1,119 @@
 # MONUAR
 
-Aplicación web social para registrar países visitados, compartir experiencias de viaje y descubrir recomendaciones. Es el proyecto final del ciclo de Desarrollo de Aplicaciones Web (DAW).
+Red social de viajes y registro visual de paises visitados. Proyecto de Fin de Grado del ciclo de Desarrollo de Aplicaciones Web (DAW), realizado por Anouar y Moises.
 
-## Antes de empezar
+MONUAR permite crear una cuenta, marcar paises visitados sobre un globo 3D, consultar el progreso personal y gestionar un perfil. Tambien incorpora publicaciones, fotografias, resenas, seguidores y un asistente de viajes.
 
-Para ver la aplicación en tu equipo necesitas:
+## Para verlo en local
 
-- PHP 8.4 o superior.
-- Composer.
-- MySQL 8 o MariaDB.
-- Un navegador web.
+Necesitas tener instalado:
 
-Puedes usar XAMPP para disponer de PHP y MySQL, o Docker Desktop para levantar los servicios en contenedores. No necesitas Node.js para ejecutar la aplicación.
+- PHP 8.4 o superior
+- Composer
+- MySQL 8 o MariaDB
+- Un navegador web
 
-## Cómo ejecutarlo
+Puedes usar XAMPP para PHP y MySQL, o Docker Desktop para levantar los servicios en contenedores.
 
-### Opción A: XAMPP o MySQL local
+### Con XAMPP o MySQL local
 
-1. Clona el repositorio y entra en la aplicación:
+```bash
+git clone https://github.com/moisessanchezsantos/TFG-Monuar.git
+cd TFG-Monuar/backend
+composer install
+copy .env.example .env
+php bin/console doctrine:database:create --if-not-exists
+php bin/console doctrine:migrations:migrate --no-interaction
+php -S 127.0.0.1:8000 -t public
+```
 
-   ```bash
-   git clone https://github.com/moisessanchezsantos/TFG-Monuar.git
-   cd TFG-Monuar/backend
-   ```
+Abre http://127.0.0.1:8000 en el navegador. En Windows, `copy` es el equivalente de `cp`.
 
-2. Instala las dependencias:
+### Con Docker
 
-   ```bash
-   composer install
-   ```
-
-3. Copia `.env.example` como `.env` y revisa la conexión a MySQL.
-
-4. Crea la base de datos y ejecuta las migraciones:
-
-   ```bash
-   php bin/console doctrine:database:create --if-not-exists
-   php bin/console doctrine:migrations:migrate --no-interaction
-   ```
-
-5. Inicia el servidor local:
-
-   ```bash
-   php -S 127.0.0.1:8000 -t public public/index.php
-   ```
-
-6. Abre [http://127.0.0.1:8000](http://127.0.0.1:8000).
-
-### Opción B: Docker
-
-Con Docker Desktop abierto y funcionando:
+Con Docker Desktop abierto:
 
 ```bash
 docker compose up --build
 ```
 
-Después abre [http://127.0.0.1:8080](http://127.0.0.1:8080).
+Abre http://127.0.0.1:8080.
 
 ## Funcionalidades
 
-- Registro, inicio y cierre de sesión.
-- Perfil personal con avatar, biografía y estadísticas.
-- Mapa interactivo de países visitados.
-- Búsqueda de países y navegación sobre el mapa.
-- Publicaciones, fotografías, reseñas y valoraciones.
-- Sistema de seguidores entre usuarios.
-- Recomendaciones de destinos mediante inteligencia artificial.
-- Panel de administración y gestión de usuarios, publicaciones y contenido.
-- API para las acciones del mapa, perfiles y publicaciones.
-- Protección de contraseñas, sesiones, validación y control de subidas.
+- Registro, inicio y cierre de sesion.
+- Perfil personal con avatar, biografia y estadisticas.
+- Mapa mundial interactivo en 3D.
+- Busqueda y seleccion de paises.
+- Registro persistente de paises visitados.
+- Publicaciones, fotografias, resenas y valoraciones.
+- Sistema de seguidores.
+- Panel de administracion.
+- API interna con respuestas JSON.
+- Chatbot de viajes conectado con Ollama y RestCountries API.
+- Validacion de formularios, contrasenas y archivos subidos.
+- Interfaz adaptable a ordenador, tablet y movil.
 
-## Tecnologías
+## Tecnologias
 
-- PHP 8.4
-- Symfony 8
-- Doctrine ORM y migraciones
-- MySQL
-- Twig
-- HTML, CSS y JavaScript
-- Stimulus y Turbo
-- Docker y Docker Compose
+PHP 8.4, Symfony 8, Doctrine ORM, MySQL/MariaDB, Twig, HTML5, CSS3, JavaScript, Fetch API, Globe.gl, WebGL, Stimulus, Turbo, Ollama, RestCountries API y Docker.
 
-## Estructura principal
+## Estructura
 
 ```text
 .
 ├── backend/
-│   ├── assets/          # JavaScript y estilos de Symfony
-│   ├── config/          # Configuración y conexión a la base de datos
-│   ├── migrations/      # Migraciones de Doctrine
-│   ├── public/          # Entrada web, páginas, API y estilos públicos
-│   ├── src/             # Controladores, entidades y repositorios
-│   ├── templates/       # Plantillas Twig
+│   ├── assets/
+│   ├── config/
+│   ├── migrations/
+│   ├── public/          # Paginas, API, CSS, JavaScript e imagenes
+│   ├── src/
+│   ├── templates/
 │   ├── composer.json
 │   └── .env.example
-├── database/             # Datos auxiliares de desarrollo
-├── docs/                 # Documentación técnica
-├── docker-compose.yml    # Servicios Docker para desarrollo
-└── arquitectura.png     # Esquema de arquitectura
+├── database/
+├── docs/
+├── docker-compose.yml
+└── arquitectura.png
 ```
+
+## Capturas
+
+### Pantalla de inicio
+
+![Pantalla de inicio](docs/monar/capturas/portada.png)
+
+### Interfaz del proyecto
+
+![Interfaz de MONUAR](docs/monar/capturas/titulo.png)
+
+### Estructura del proyecto
+
+![Estructura del proyecto](docs/monar/capturas/Estructura.png)
+
+### Arquitectura
+
+![Arquitectura de MONUAR](docs/monar/capturas/arquitectura.png)
+
+## Documentacion del TFG
+
+- [Memoria completa del proyecto](docs/monar/MEMORIA-MONAR.pdf)
+- [Presentacion y defensa](docs/monar/DEFENSA-MONAR.pdf)
+- [Documentacion de actualizaciones](docs/monar/ACTUALIZACION.md)
+
+## Seguridad y datos
+
+El repositorio no incluye archivos `.env` reales, contrasenas, claves privadas ni copias de la base de datos. `.env.example` contiene valores de referencia para desarrollo local. Antes de un despliegue real hay que configurar secretos, HTTPS, una base de datos gestionada y almacenamiento seguro para archivos subidos.
 
 ## Despliegue
 
-MONUAR no es una web estática: necesita PHP, una base de datos y un servidor capaz de ejecutar Symfony. Por eso no se puede desplegar directamente en Vercel como el portfolio Angular.
+MONUAR necesita PHP, Symfony y MySQL/MariaDB, por lo que no es una web estatica para Vercel. Para una demo publica se recomienda un servicio compatible con PHP y base de datos, o publicar el repositorio junto con estas capturas en el portfolio.
 
-Para una demo pública se recomienda un servicio con soporte para PHP y MySQL, o desplegar el contenedor Docker en un servidor. Si no hay una demo online estable, el enlace al repositorio junto con capturas del mapa, el perfil y la gestión de publicaciones es una presentación profesional.
+## Estado
 
-## Estado del proyecto
-
-Proyecto académico completo y en evolución. La configuración incluida está pensada principalmente para desarrollo local. Antes de usarlo en producción habría que configurar secretos del servidor, HTTPS, copias de seguridad, almacenamiento externo para archivos subidos y una base de datos gestionada.
+Proyecto academico completo y en evolucion. La aplicacion se ha desarrollado como trabajo de fin de grado y documenta analisis, diseno, desarrollo, pruebas, arquitectura y futuras mejoras.
 
 ## Autor
 
-Moisés Sánchez Santos  
+Moises Sanchez Santos  
 [GitHub](https://github.com/moisessanchezsantos)
